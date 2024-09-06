@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر HTML مباشر</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- إضافة Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #editor {
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-height: 200px;
+            overflow-y: auto;
+            direction: ltr;
+        }
+        #htmlOutput {
+            background-color: #f8f9fa;
+            border: 1px solid #ccc;
+            padding: 10px;
+            white-space: pre-wrap;
+            min-height: 100px;
+            overflow-y: auto;
+        }
+        .toolbar {
+            text-align: right;
+        }
+        .title {
+            text-align: right;
+        }
+        .algin {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="title">HTML محرر</h1>
+
+    <!-- أدوات التنسيق -->
+    <div class="toolbar mb-2" role="group">
+        <button type="button" class="btn btn-primary" onclick="execCommand('bold')">
+            <i class="fas fa-bold"></i> غامق
+        </button>
+        <button type="button" class="btn btn-primary" onclick="execCommand('italic')">
+            <i class="fas fa-italic"></i> مائل
+        </button>
+        <button type="button" class="btn btn-primary" onclick="execCommand('underline')">
+            <i class="fas fa-underline"></i> خط أسفل السطر
+        </button>
+        <button type="button" class="btn btn-primary" onclick="execCommand('insertOrderedList')">
+            <i class="fas fa-list-ol"></i> ترقيم
+        </button>
+        <button type="button" class="btn btn-primary" onclick="execCommand('insertUnorderedList')">
+            <i class="fas fa-list-ul"></i> نص منقط
+        </button>
+        <button type="button" class="btn btn-primary" onclick="execCommand('createLink', prompt('أدخل رابط'))">
+            <i class="fas fa-link"></i> رابط تشعيبي
+        </button>
+        <button type="button" class="btn btn-primary" onclick="execCommand('insertHorizontalRule')">
+            <i class="fas fa-minus"></i> خط أفقي
+        </button>
+
+        <!-- تحديد اتجاه النص -->
+        <button type="button" class="btn btn-info" onclick="setDirection('rtl')">
+            <i class="fas fa-align-right"></i> نص إلى اليسار
+        </button>
+        <button type="button" class="btn btn-info" onclick="setDirection('ltr')">
+            <i class="fas fa-align-left"></i> نص إلى اليمين
+        </button>
+
+        <!-- اختيار نوع الخط -->
+        <select class="form-select d-inline" id="fontType" style="width: auto;" onchange="setFontType()">
+            <option value="Arial">Arial</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Changa">Changa</option>
+            <option value="Amiri">Amiri</option>
+            <option value="Courier New">Courier New</option>
+        </select>
+
+        <!-- حجم النص -->
+        <select class="form-select d-inline" id="fontSize" style="width: auto;" onchange="setFontSize()">
+            <option value="11px">11px</option>
+            <option value="13px">13px</option>
+            <option value="15px">15px</option>
+            <option value="18px">18px</option>
+            <option value="20px">20px</option>
+            <option value="22px">22px</option>
+            <option value="25px">25px</option>
+            <option value="30px">30px</option>
+            <option value="35px">35px</option>
+            <option value="50px">50px</option>
+        </select>
+
+        <!-- تنسيق العناوين -->
+        <select class="form-select d-inline" id="formatBlock" style="width: auto;" onchange="setFormatBlock()">
+            <option value="p">نص عادي</option>
+            <option value="h1">عنوان 1</option>
+            <option value="h2">عنوان 2</option>
+            <option value="h3">عنوان 3</option>
+            <option value="h4">عنوان 4</option>
+            <option value="h5">عنوان 5</option>
+            <option value="h6">عنوان 6</option>
+        </select>
+    </div>
+
+    <!-- محرر النصوص -->
+    <div id="editor" contenteditable="true" class="form-control">
+    </div>
+
+    <button class="btn btn-success mt-3 algin" onclick="generateHtml()">HTML شاهد الكود المصدري</button>
+
+    <h2 class="mt-4 title">مصدر الخام</h2>
+    <pre id="htmlOutput"></pre>
+
+    <button class="btn btn-primary mt-3" onclick="downloadHtmlFile()">تحميل الملف</button>
+
+    <script>
+        // تنفيذ أوامر التعديل
+        function execCommand(command, value = null) {
+            document.execCommand(command, false, value);
+        }
+
+        // تغيير نوع الخط
+        function setFontType() {
+            const fontType = document.getElementById('fontType').value;
+            execCommand('fontName', fontType);
+        }
+
+        // تغيير حجم النص
+        function setFontSize() {
+            const fontSize = document.getElementById('fontSize').value;
+            document.getElementById('editor').style.fontSize = fontSize;
+        }
+
+        // تغيير تنسيق العناوين
+        function setFormatBlock() {
+            const formatBlock = document.getElementById('formatBlock').value;
+            execCommand('formatBlock', formatBlock);
+        }
+
+        // تحويل محتوى المحرر إلى HTML
+        function generateHtml() {
+            const editorContent = document.getElementById('editor').innerHTML;
+            document.getElementById('htmlOutput').textContent = editorContent;
+        }
+
+        // تنزيل الملف كـ HTML
+        function downloadHtmlFile() {
+            const htmlContent = document.getElementById('htmlOutput').textContent;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const link = document.createElement('a');
+            link
+            .href = URL.createObjectURL(blob);
+            link.download = 'محرر.html';
+            link.click();
+        }
+
+        // تغيير اتجاه النص
+        function setDirection(direction) {
+            document.getElementById('editor').style.direction = direction;
+        }
+    </script>
+
+</body>
+</html>
